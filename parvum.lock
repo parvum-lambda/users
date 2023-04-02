@@ -1,0 +1,12 @@
+{
+    "events": {
+        "id": 92111487,
+        "node_id": "RE_kwDOI5dQus4FfYJ_",
+        "html_url": "https://github.com/parvum-lambda/events/releases/tag/v1.0.0-alpha.1",
+        "tarball_url": "https://api.github.com/repos/parvum-lambda/events/tarball/v1.0.0-alpha.1",
+        "zipball_url": "https://api.github.com/repos/parvum-lambda/events/zipball/v1.0.0-alpha.1",
+        "url": "https://api.github.com/repos/parvum-lambda/events/releases/92111487",
+        "tag_name": "v1.0.0-alpha.1",
+        "published_at": "2023-02-11T14:25:17Z"
+    }
+}

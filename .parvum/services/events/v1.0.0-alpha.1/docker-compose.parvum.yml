@@ -1,0 +1,45 @@
+version: "3.8"
+
+networks:
+  events:
+    driver: bridge
+  parvum:
+    name: ${PARVUM_NETWORK}
+    external: true
+
+volumes:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
+
+services:
+  zookeeper:
+    image: docker.io/bitnami/zookeeper:3.8
+    volumes:
+      - "zookeeper_data:/bitnami"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      events:
+  kafka:
+    image: docker.io/bitnami/kafka:3.3
+    volumes:
+      - "kafka_data:/bitnami"
+    expose:
+      - 9092
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    networks:
+      events:
+      parvum:
+        ipv4_address: ${PARVUM_IPV4_ADDRESS}
+    ports:
+      - "9092:9092"
+      - "9091:9091"
+    depends_on:
+      - zookeeper
+
