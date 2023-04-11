@@ -2,21 +2,20 @@
 
 namespace Support\CQRS;
 
-use FilesystemIterator;
 use Generator;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use ReflectionClass;
 use ReflectionException;
-use RegexIterator;
-use Support\Attributes\Router\ClassParser\ClassParser;
 use Support\CQRS\Attributes\CommandHandler;
-use Support\CQRS\Attributes\EventHandler;
+use Support\CQRS\Attributes\EventConsumer;
 
 class CQRSService
 {
+    private const DOMAIN_PATH = 'src/Domain';
     private array $commandHandlerMap = [];
     private array $eventHandlerMap = [];
+    private array $topicList = [];
 
     /**
      * @return void
@@ -24,14 +23,35 @@ class CQRSService
      */
     public function init() : void
     {
-        $domainClasses = $this->getClasses();
+        $domainClasses = getClasses(self::DOMAIN_PATH);
 
         $this->createMappings($domainClasses);
     }
 
-    public function getHandlerFromCommand(string $commandStructClass)
+    /**
+     * @param string $commandStructClass
+     * @return Interfaces\CommandHandler|null
+     */
+    public function getHandlerForCommand(string $commandStructClass) : Interfaces\CommandHandler| null
     {
         return $this->commandHandlerMap[$commandStructClass] ?? null;
+    }
+
+    /**
+     * @param string $topic
+     * @return Interfaces\EventConsumer[]
+     */
+    public function getHandlersForTopic(string $topic) : array
+    {
+        return $this->eventHandlerMap[$topic] ?? [];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getTopics() : array
+    {
+        return $this->topicList;
     }
 
     /**
@@ -44,6 +64,8 @@ class CQRSService
     {
         $commandHandlerMap = [];
         $eventHandlerMap = [];
+        $topicList = [];
+
         foreach ($classes as $fullClass) {
             $class = new ReflectionClass($fullClass);
 
@@ -51,13 +73,20 @@ class CQRSService
                 continue;
             }
 
-            self::pushToCommandHandlerMap($commandHandlerMap, $class) || self::pushToEventHandlerMap($eventHandlerMap, $class);
+            self::pushToCommandHandlerMap($commandHandlerMap, $class) || self::pushToEventHandlerMap($eventHandlerMap, $topicList, $class);
         }
 
         $this->commandHandlerMap = $commandHandlerMap;
         $this->eventHandlerMap = $eventHandlerMap;
+        $this->topicList = $topicList;
     }
 
+    /**
+     * @param $stack
+     * @param ReflectionClass $currentClass
+     * @return bool
+     * @throws BindingResolutionException
+     */
     private static function pushToCommandHandlerMap(&$stack, ReflectionClass $currentClass) : bool
     {
         $commandHandlerAttributeBuffer = $currentClass->getAttributes(CommandHandler::class);
@@ -72,14 +101,17 @@ class CQRSService
 
         assert($commandHandlerAttributeInstance instanceof CommandHandler);
 
-        $stack[$commandHandlerAttributeInstance->getTargetCommandClass()] = $currentClass->getName();
+        $stack[$commandHandlerAttributeInstance->getTargetCommandClass()] = Container::getInstance()->make($currentClass->getName());
 
         return true;
     }
 
-    private static function pushToEventHandlerMap(&$stack, ReflectionClass $currentClass) : bool
+    /**
+     * @throws BindingResolutionException
+     */
+    private static function pushToEventHandlerMap(&$eventHandlerStack, &$topicStack, ReflectionClass $currentClass) : bool
     {
-        $eventHandlerAttributeBuffer = $currentClass->getAttributes(EventHandler::class);
+        $eventHandlerAttributeBuffer = $currentClass->getAttributes(EventConsumer::class);
 
         if (empty($eventHandlerAttributeBuffer)) {
             return false;
@@ -89,35 +121,20 @@ class CQRSService
 
         $eventHandlerAttributeInstance = $eventHandlerAttribute->newInstance();
 
-        assert($eventHandlerAttributeInstance instanceof EventHandler);
+        assert($eventHandlerAttributeInstance instanceof EventConsumer);
 
-        $stack[$eventHandlerAttributeInstance->getTargetEventClass()] = $currentClass->getName();
+        $topic = $eventHandlerAttributeInstance->getTopic();
 
-        return true;
-    }
-
-    /**
-     * @return Generator
-     */
-    private function getClasses() : Generator
-    {
-        $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(base_path('src/Domain'), FilesystemIterator::SKIP_DOTS));
-        $regexIterator = new RegexIterator($directoryIterator, '/\.php$/');
-
-        foreach ($regexIterator as $phpFile) {
-            $path = $phpFile->getRealPath();
-
-            if (! is_file($path)) {
-                continue;
-            }
-
-            $classParser = new ClassParser(file_get_contents($path));
-
-            foreach ($classParser->getClasses() as $class) {
-                yield $class;
-            }
+        if (! in_array($topic, $topicStack)) {
+            $topicStack[] = $topic;
         }
 
-        $directoryIterator->endIteration();
+        if (! isset($eventHandlerStack[$topic])) {
+            $eventHandlerStack[$topic] = [];
+        }
+
+        $eventHandlerStack[$topic][] = Container::getInstance()->make(($currentClass->getName()));
+
+        return true;
     }
 }

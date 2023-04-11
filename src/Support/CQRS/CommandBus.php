@@ -2,8 +2,6 @@
 
 namespace Support\CQRS;
 
-use Support\CQRS\Interfaces\CommandHandler;
-
 readonly class CommandBus
 {
     public function __construct(private CQRSService $CQRSService)
@@ -12,12 +10,8 @@ readonly class CommandBus
 
     public function execute($command) : mixed
     {
-        $handlerClass = $this->CQRSService->getHandlerFromCommand(get_class($command));
+        $handler = $this->CQRSService->getHandlerForCommand(get_class($command));
 
-        $handler = app($handlerClass);
-
-        assert($handler instanceof CommandHandler);
-
-        return $handler->handle($command);
+        return $handler?->handle($command);
     }
 }

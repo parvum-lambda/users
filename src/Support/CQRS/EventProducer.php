@@ -20,6 +20,8 @@ abstract class EventProducer
      */
     public function dispatch() : void
     {
+        $this->persistEvent();
+
         $reflector = new ReflectionClass($this::class);
         $attributes = $reflector->getAttributes(EventProducerAttribute::class);
 
@@ -43,5 +45,9 @@ abstract class EventProducer
         );
 
         $kafkaProducer->send();
+    }
+
+    private function persistEvent() : void
+    {
     }
 }
