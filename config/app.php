@@ -194,6 +194,7 @@ return [
         \App\Providers\CQRSServiceProvider::class,
         \App\Providers\RouteAttributesServiceProvider::class,
         \Junges\Kafka\Providers\LaravelKafkaServiceProvider::class,
+        \BaoPham\DynamoDb\DynamoDbServiceProvider::class,
     ],
 
     /*
