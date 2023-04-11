@@ -6,8 +6,8 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use Support\Attributes\Router\RouteGroup;
-use Support\Attributes\Router\Shortcuts\Middlewares\Api;
+use Support\Router\RouteGroup;
+use Support\Router\Shortcuts\Middlewares\Api;
 
 #[RouteGroup]
 #[Api('v1')]
