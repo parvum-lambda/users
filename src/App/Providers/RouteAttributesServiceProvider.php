@@ -3,26 +3,23 @@
 namespace App\Providers;
 
 use Closure;
-use FilesystemIterator;
 use Generator;
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Support\Facades\Route as Router;
 use Illuminate\Support\ServiceProvider;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
-use RegexIterator;
-use Support\Attributes\Router\ClassParser\ClassParser;
-use Support\Attributes\Router\Constraints\Where;
-use Support\Attributes\Router\Options\Option;
-use Support\Attributes\Router\Route;
-use Support\Attributes\Router\RouteGroup;
-use Support\Attributes\Router\Shortcuts\Shortcut;
+use Support\Router\Constraints\Where;
+use Support\Router\Options\Option;
+use Support\Router\Route;
+use Support\Router\RouteGroup;
+use Support\Router\Shortcuts\Shortcut;
 
 class RouteAttributesServiceProvider extends ServiceProvider
 {
+    private const API_PATH = 'src/App/Api';
+
     /**
      * @return void
      */
@@ -42,7 +39,7 @@ class RouteAttributesServiceProvider extends ServiceProvider
      */
     private function createRoutes() : void
     {
-        foreach ($this->getClasses() as $fullClass) {
+        foreach (getClasses(self::API_PATH) as $fullClass) {
             $class = new ReflectionClass($fullClass);
             if ($class->isAbstract()) {
                 continue;
@@ -65,31 +62,6 @@ class RouteAttributesServiceProvider extends ServiceProvider
 
             self::wrapRoutes($classStack, $routes)();
         }
-    }
-
-    /**
-     * @return Generator
-     */
-    private function getClasses() : Generator
-    {
-        $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(base_path('src/App/Api'), FilesystemIterator::SKIP_DOTS));
-        $regexIterator = new RegexIterator($directoryIterator, '/Controller\.php$/');
-
-        foreach ($regexIterator as $phpFile) {
-            $path = $phpFile->getRealPath();
-
-            if (! is_file($path)) {
-                continue;
-            }
-
-            $classParser = new ClassParser(file_get_contents($path));
-
-            foreach ($classParser->getClasses() as $class) {
-                yield $class;
-            }
-        }
-
-        $directoryIterator->endIteration();
     }
 
     /**
