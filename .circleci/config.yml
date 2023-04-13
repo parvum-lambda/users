@@ -21,6 +21,12 @@ jobs:
             npx semantic-release
       - run: mkdir -p semantic-release-workspace
       - run: echo $(node -e "console.log(require('./package.json').version)") > semantic-release-workspace/released-version
+      - run:
+          shell: "/bin/bash"
+          name: "Dump version to workspace"
+          command:
+              mkdir -p semantic-release-workspace
+              echo $(node -e "console.log(require('./package.json').version)") > semantic-release-workspace/released-version
       - persist_to_workspace:
           root: semantic-release-workspace
           paths:
@@ -31,9 +37,14 @@ jobs:
       - image: circleci/buildpack-deps:stretch
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 20.10.14
       - attach_workspace:
           at: /tmp/semantic-release-workspace
-      - run: echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+      - run:
+          shell: "/bin/bash"
+          name: "Docker login"
+          command: echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USER --password-stdin
       - run:
           shell: "/bin/bash"
           name: "Build image"
