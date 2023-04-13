@@ -24,7 +24,6 @@ jobs:
           name: "Dump version to workspace"
           command: |
               mkdir -p semantic-release-workspace
-              echo $(node -e "console.log(require('./package.json').version)")
               echo $(node -e "console.log(require('./package.json').version)") > semantic-release-workspace/released-version
       - persist_to_workspace:
           root: semantic-release-workspace
@@ -44,22 +43,17 @@ jobs:
           shell: "/bin/bash"
           name: "Docker login"
           command: echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USER --password-stdin
-#      - run:
-#          shell: "/bin/bash"
-#          name: "Build image"
-#          command: docker build -t=parvum-release -f parvum.Dockerfile .
+      - run:
+          shell: "/bin/bash"
+          name: "Build image"
+          command: docker build -t=parvum-release -f parvum.Dockerfile .
       - run:
           shell: "/bin/bash"
           name: "Push to DockerHub"
           command: |
             export RELEASED_VERSION=$(cat /tmp/semantic-release-workspace/released-version)
-            cat /tmp/semantic-release-workspace/released-version
-            ls /tmp
-            ls /tmp/semantic-release-workspace
-            echo [ -f /tmp/semantic-release-workspace/released-version ] && echo "exists"
-            echo $RELEASED_VERSION
-#            docker tag parvum-release:latest kiske/users:$RELEASED_VERSION
-#            docker push kiske/users:$RELEASED_VERSION
+            docker tag parvum-release:latest kiske/users:$RELEASED_VERSION
+            docker push kiske/users:$RELEASED_VERSION
             
 
 workflows:
