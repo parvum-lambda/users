@@ -19,6 +19,35 @@ jobs:
           command: |
             export GITHUB_TOKEN="$GITHUB_TOKEN"
             npx semantic-release
+      - run: mkdir -p semantic-release-workspace
+      - run: echo $(node -e "console.log(require('./package.json').version)") > semantic-release-workspace/released-version
+      - persist_to_workspace:
+          root: semantic-release-workspace
+          paths:
+            - released-version
+
+  dockerhub-publish:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/semantic-release-workspace
+      - run: echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+      - run:
+          shell: "/bin/bash"
+          name: "Build image"
+          command: docker build -t=parvum-release -f parvum.Dockerfile .
+      - run:
+          shell: "/bin/bash"
+          name: "Push to DockerHub"
+          command: |
+            export RELEASED_VERSION=$(cat /tmp/semantic-release-workspace/released-version)
+            docker tag parvum-release:latest kiske/users:$RELEASED_VERSION
+            docker push kiske/users:$RELEASED_VERSION
+    requires:
+      - release-version
+            
 
 workflows:
   release-version-workflow:

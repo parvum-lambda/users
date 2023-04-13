@@ -1,6 +1,12 @@
 {
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/parvum-lambda/users.git"
+    },
+    "version": "0.0.0-development",
     "scripts": {
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "semantic-release": "semantic-release"
     },
     "devDependencies": {
         "@commitlint/cli": "^13.1.0",
