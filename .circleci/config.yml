@@ -45,8 +45,6 @@ jobs:
             export RELEASED_VERSION=$(cat /tmp/semantic-release-workspace/released-version)
             docker tag parvum-release:latest kiske/users:$RELEASED_VERSION
             docker push kiske/users:$RELEASED_VERSION
-    requires:
-      - release-version
             
 
 workflows:
@@ -58,4 +56,12 @@ workflows:
           filters:
             branches:
               only: /main|beta|alpha/
+      - dockerhub-publish:
+          context:
+            - gh-parvum
+          filters:
+            branches:
+              only: /main|beta|alpha/
+          requires:
+            - release-version
 
