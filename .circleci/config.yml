@@ -19,13 +19,12 @@ jobs:
           command: |
             export GITHUB_TOKEN="$GITHUB_TOKEN"
             npx semantic-release
-      - run: mkdir -p semantic-release-workspace
-      - run: echo $(node -e "console.log(require('./package.json').version)") > semantic-release-workspace/released-version
       - run:
           shell: "/bin/bash"
           name: "Dump version to workspace"
           command:
               mkdir -p semantic-release-workspace
+              echo $(node -e "console.log(require('./package.json').version)")
               echo $(node -e "console.log(require('./package.json').version)") > semantic-release-workspace/released-version
       - persist_to_workspace:
           root: semantic-release-workspace
