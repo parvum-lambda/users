@@ -22,7 +22,7 @@ jobs:
       - run:
           shell: "/bin/bash"
           name: "Dump version to workspace"
-          command:
+          command: |
               mkdir -p semantic-release-workspace
               echo $(node -e "console.log(require('./package.json').version)")
               echo $(node -e "console.log(require('./package.json').version)") > semantic-release-workspace/released-version
