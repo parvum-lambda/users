@@ -85,7 +85,6 @@ COPY . .
 
 RUN composer install
 RUN composer run post-autoload-dump
-RUN composer run post-create-project-cmd
 
 RUN echo APP_KEY=base64:$(openssl rand -base64 32) > .env
 
