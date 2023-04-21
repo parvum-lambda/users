@@ -1,3 +1,10 @@
+# [1.0.0-alpha.2](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.1...v1.0.0-alpha.2) (2023-04-21)
+
+
+### Features
+
+* full user creation flow ([a069df4](https://github.com/parvum-lambda/users/commit/a069df4e96db926a3d9346387d3eb8c78ffb7c32))
+
 # 1.0.0-alpha.1 (2023-04-13)
 
 
