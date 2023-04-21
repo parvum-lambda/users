@@ -9,20 +9,27 @@ networks:
 
 services:
   laravel.test:
-    image: '${PARVUM_IMAGE}'
-    container_name: parvum.users-${PARVUM_VERSION}
+    build:
+      context: .docker/php/8.2
+      dockerfile: .docker/php/8.2/Dockerfile
+    image: sail-8.2/parvum.users
+    container_name: parvum.users-local
     extra_hosts:
       - 'host.docker.internal:host-gateway'
       - 'parvum.events:${PARVUM_SERVICE_EVENTS_IP}'
     ports:
       - '${APP_PORT:-80}:80'
       - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+    volumes:
+      - '.:/var/www/html'
     networks:
       sail:
       parvum:
         ipv4_address: ${PARVUM_IPV4_ADDRESS}
     depends_on:
       - pgsql
+      - dynamodb
+
   pgsql:
     image: 'postgres:15'
     ports:
@@ -41,6 +48,20 @@ services:
       test: [ "CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}" ]
       retries: 3
       timeout: 5s
+
+  dynamodb:
+    image: amazon/dynamodb-local
+    container_name: my-dynamodb
+    hostname: dynamodb
+    restart: always
+    volumes:
+      - ./dynamodblocal-data:/home/dynamodblocal/data
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data/"
+    networks:
+      - sail
+
 volumes:
   sail-pgsql:
+    driver: local
+  users-events-cache-ddb:
     driver: local

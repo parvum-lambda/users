@@ -7,6 +7,41 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV TZ=UTC
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
+ENV APP_NAME=Users
+ENV APP_ENV=local
+ENV APP_DEBUG=true
+ENV APP_URL=http://localhost
+ENV APP_PORT=8000
+
+ENV LOG_CHANNEL=stack
+ENV LOG_DEPRECATIONS_CHANNEL=null
+ENV LOG_LEVEL=debug
+
+ENV DB_CONNECTION=pgsql
+ENV DB_HOST=pgsql
+ENV DB_PORT=5432
+ENV DB_DATABASE=parvum_users
+ENV DB_USERNAME=users
+ENV DB_PASSWORD=password
+
+ENV BROADCAST_DRIVER=log
+ENV CACHE_DRIVER=file
+ENV FILESYSTEM_DISK=local
+ENV QUEUE_CONNECTION=sync
+ENV SESSION_DRIVER=file
+ENV SESSION_LIFETIME=120
+
+ENV MEMCACHED_HOST=127.0.0.1
+
+ENV KAFKA_BROKERS=parvum.events:9092
+
+ENV DYNAMODB_LOCAL=true
+ENV DYNAMODB_CONNECTION=local
+ENV DYNAMODB_LOCAL_ENDPOINT=dynamodb:8000
+
+ENV XDEBUG_MODE=off
+ENV XDEBUG_CONFIG="client_host=host.docker.internal"
+
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get update \
@@ -50,8 +85,9 @@ COPY . .
 
 RUN composer install
 RUN composer run post-autoload-dump
-RUN composer run post-root-package-install
 RUN composer run post-create-project-cmd
+
+RUN echo APP_KEY=base64:$(openssl rand -base64 32) > .env
 
 EXPOSE 8000
 

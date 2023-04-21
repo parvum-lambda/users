@@ -40,6 +40,9 @@ jobs:
       - attach_workspace:
           at: /tmp/semantic-release-workspace
       - run:
+          name: "Setup custom environment variables"
+          command: echo 'export RELEASED_VERSION=$(cat /tmp/semantic-release-workspace/released-version)' >> "$BASH_ENV"
+      - run:
           shell: "/bin/bash"
           name: "Docker login"
           command: echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USER --password-stdin
@@ -47,20 +50,23 @@ jobs:
           shell: "/bin/bash"
           name: "Check image released"
           command: |
-            export RELEASED_VERSION=$(cat /tmp/semantic-release-workspace/released-version)
-            [ "$(docker manifest inspect kiske/users:$RELEASED_VERSION > /dev/null ; echo $?)" != "0"  ] && circleci-agent step halt
+            if [ "$(docker manifest inspect $DOCKER_REPOSITORY/$CIRCLE_PROJECT_REPONAME:$RELEASED_VERSION > /dev/null 2>&1 ; echo $?)" != "0"  ]; then
+              echo "Image already publish to this version, skipping"
+              circleci-agent step halt
+            fi
       - run:
           shell: "/bin/bash"
           name: "Build image"
-          command: docker build -t=parvum-release -f parvum.Dockerfile .
+          command: |
+            echo Building $CIRCLE_PROJECT_REPONAME v$RELEASED_VERSION
+            docker build -t=parvum-release -f parvum.Dockerfile .
       - run:
           shell: "/bin/bash"
           name: "Push to DockerHub"
           command: |
-            echo $RELEASED_VERSION
-            export RELEASED_VERSION=$(cat /tmp/semantic-release-workspace/released-version)
-            docker tag parvum-release:latest kiske/users:$RELEASED_VERSION
-            docker push kiske/users:$RELEASED_VERSION
+            echo Publishing $CIRCLE_PROJECT_REPONAME v$RELEASED_VERSION
+            docker tag parvum-release:latest $DOCKER_REPOSITORY/$CIRCLE_PROJECT_REPONAME:$RELEASED_VERSION
+            docker push $DOCKER_REPOSITORY/$CIRCLE_PROJECT_REPONAME:$RELEASED_VERSION
 
 workflows:
   release-version-workflow:
