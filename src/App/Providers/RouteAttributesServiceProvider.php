@@ -4,9 +4,9 @@ namespace App\Providers;
 
 use Closure;
 use Generator;
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Routing\Route as IlluminateRoute;
 use Illuminate\Support\Facades\Route as Router;
-use Illuminate\Support\ServiceProvider;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -16,7 +16,7 @@ use Support\Router\Route;
 use Support\Router\RouteGroup;
 use Support\Router\Shortcuts\Shortcut;
 
-class RouteAttributesServiceProvider extends ServiceProvider
+class RouteAttributesServiceProvider extends RouteServiceProvider
 {
     private const API_PATH = 'src/App/Api';
 
@@ -25,6 +25,7 @@ class RouteAttributesServiceProvider extends ServiceProvider
      */
     public function register() : void
     {
+        parent::register();
         $this->booted(function () {
             if (! $this->app->routesAreCached()) {
                 $this->createRoutes();
@@ -191,7 +192,9 @@ class RouteAttributesServiceProvider extends ServiceProvider
         $routeGroupClassAttr = $currentClass->getAttributes(RouteGroup::class)[0] ?? null;
 
         if (! $routeGroupClassAttr) {
-            return self::wrapRoutes($stack, $routes, $current);
+            return function () use ($stack, $routes, $current) {
+                Router::group([], self::wrapRoutes($stack, $routes, $current));
+            };
         }
 
         $routeGroupClassAttrInstance = $routeGroupClassAttr->newInstance();

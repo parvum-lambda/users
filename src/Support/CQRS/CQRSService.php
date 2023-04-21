@@ -2,6 +2,7 @@
 
 namespace Support\CQRS;
 
+use Exception;
 use Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -9,12 +10,14 @@ use ReflectionClass;
 use ReflectionException;
 use Support\CQRS\Attributes\CommandHandler;
 use Support\CQRS\Attributes\EventConsumer;
+use Support\CQRS\Attributes\EventStruct;
 
 class CQRSService
 {
     private const DOMAIN_PATH = 'src/Domain';
     private array $commandHandlerMap = [];
     private array $eventHandlerMap = [];
+    private array $eventTopicStructMap = [];
     private array $topicList = [];
 
     /**
@@ -47,6 +50,15 @@ class CQRSService
     }
 
     /**
+     * @param string $topic
+     * @return mixed
+     */
+    public function getStructForEventTopic(string $topic) : mixed
+    {
+        return $this->eventTopicStructMap[$topic] ?? null;
+    }
+
+    /**
      * @return string[]
      */
     public function getTopics() : array
@@ -64,6 +76,7 @@ class CQRSService
     {
         $commandHandlerMap = [];
         $eventHandlerMap = [];
+        $eventTopicStructMap = [];
         $topicList = [];
 
         foreach ($classes as $fullClass) {
@@ -73,12 +86,15 @@ class CQRSService
                 continue;
             }
 
-            self::pushToCommandHandlerMap($commandHandlerMap, $class) || self::pushToEventHandlerMap($eventHandlerMap, $topicList, $class);
+            self::pushToCommandHandlerMap($commandHandlerMap, $class) ||
+            self::pushToEventHandlerMap($eventHandlerMap, $topicList, $class) ||
+            self::pushToTopicStructMap($eventTopicStructMap, $class);
         }
 
         $this->commandHandlerMap = $commandHandlerMap;
         $this->eventHandlerMap = $eventHandlerMap;
         $this->topicList = $topicList;
+        $this->eventTopicStructMap = $eventTopicStructMap;
     }
 
     /**
@@ -133,7 +149,36 @@ class CQRSService
             $eventHandlerStack[$topic] = [];
         }
 
-        $eventHandlerStack[$topic][] = Container::getInstance()->make(($currentClass->getName()));
+        $eventHandlerStack[$topic][] = Container::getInstance()->make($currentClass->getName());
+
+        return true;
+    }
+
+    /**
+     * @throws BindingResolutionException
+     * @throws Exception
+     */
+    private static function pushToTopicStructMap(&$eventStruckStack, ReflectionClass $currentClass) : bool
+    {
+        $eventStructAttributeBuffer = $currentClass->getAttributes(EventStruct::class);
+
+        if (empty($eventStructAttributeBuffer)) {
+            return false;
+        }
+
+        $eventStructAttribute = $eventStructAttributeBuffer[0];
+
+        $eventStructAttributeInstance = $eventStructAttribute->newInstance();
+
+        assert($eventStructAttributeInstance instanceof EventStruct);
+
+        $topic = $eventStructAttributeInstance->getTopic();
+
+        if (isset($eventStruckStack[$topic])) {
+            throw new Exception("Multiple structs for topic $topic");
+        }
+
+        $eventStruckStack[$topic] = $currentClass->getName();
 
         return true;
     }

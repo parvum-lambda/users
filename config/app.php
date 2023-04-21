@@ -176,9 +176,9 @@ return [
         //        Illuminate\Redis\RedisServiceProvider::class,
         //        Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
         //        Illuminate\Session\SessionServiceProvider::class,
-        //        Illuminate\Translation\TranslationServiceProvider::class,
-        //        Illuminate\Validation\ValidationServiceProvider::class,
-        //        Illuminate\View\ViewServiceProvider::class,
+        Illuminate\Translation\TranslationServiceProvider::class,
+        Illuminate\Validation\ValidationServiceProvider::class,
+        Illuminate\View\ViewServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -195,6 +195,7 @@ return [
         \App\Providers\RouteAttributesServiceProvider::class,
         \Junges\Kafka\Providers\LaravelKafkaServiceProvider::class,
         \BaoPham\DynamoDb\DynamoDbServiceProvider::class,
+        \Aws\Laravel\AwsServiceProvider::class,
     ],
 
     /*
@@ -209,6 +210,6 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        // 'ExampleClass' => App\Example\ExampleClass::class,
+        'AWS' => Aws\Laravel\AwsFacade::class,
     ])->toArray(),
 ];

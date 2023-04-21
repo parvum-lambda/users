@@ -2,11 +2,14 @@
 
 namespace App\Api\V1\Controllers;
 
+use App\Api\V1\Requests\UsersRequest;
 use Domain\Users\Commands\Struct\CreateUserCommand;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response as ResponseFacade;
 use Support\CQRS\CommandBus;
 use Support\Router\Methods\Post;
 use Support\Router\RouteGroup;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 #[RouteGroup('users')]
 class UsersController extends Controller
@@ -16,8 +19,14 @@ class UsersController extends Controller
     }
 
     #[Post]
-    public function create(Request $request) : mixed
+    public function store(UsersRequest $request) : JsonResponse
     {
-        return $this->commandBus->execute(new CreateUserCommand(...$request->all()));
+        $user = $this->commandBus->execute(
+            new CreateUserCommand(
+                ...$request->all()
+            )
+        );
+
+        return ResponseFacade::json($user, HttpResponse::HTTP_CREATED);
     }
 }
