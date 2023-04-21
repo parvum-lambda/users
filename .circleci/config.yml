@@ -50,9 +50,7 @@ jobs:
           shell: "/bin/bash"
           name: "Check image released"
           command: |
-            cat cat /tmp/semantic-release-workspace/released-version
-            echo $RELEASED_VERSION
-            if [ "$(docker manifest inspect $DOCKER_REPOSITORY/$CIRCLE_PROJECT_REPONAME:$RELEASED_VERSION > /dev/null 2>&1 ; echo $?)" != "0"  ]; then
+            if [ "$(docker manifest inspect $DOCKER_REPOSITORY/$CIRCLE_PROJECT_REPONAME:$RELEASED_VERSION > /dev/null 2>&1 ; echo $?)" == "0"  ]; then
               echo "Image already publish to this version, skipping"
               circleci-agent step halt
             fi
