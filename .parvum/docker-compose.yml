@@ -14,9 +14,6 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
       - 'parvum.events:${PARVUM_SERVICE_EVENTS_IP}'
-    ports:
-      - '${APP_PORT:-80}:80'
-      - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
     networks:
       sail:
       parvum:
@@ -27,18 +24,13 @@ services:
     image: 'postgres:15'
     ports:
       - '${FORWARD_DB_PORT:-5432}:5432'
-    environment:
-      PGPASSWORD: '${DB_PASSWORD:-secret}'
-      POSTGRES_DB: '${DB_DATABASE}'
-      POSTGRES_USER: '${DB_USERNAME}'
-      POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
     volumes:
       - 'sail-pgsql:/var/lib/postgresql/data'
       - './vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
     networks:
       - sail
     healthcheck:
-      test: [ "CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}" ]
+      test: [ "CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "users" ]
       retries: 3
       timeout: 5s
 volumes:
