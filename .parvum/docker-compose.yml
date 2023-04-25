@@ -8,7 +8,7 @@ networks:
     driver: bridge
 
 services:
-  laravel.test:
+  laravel:
     image: '${PARVUM_IMAGE}'
     container_name: parvum.users-${PARVUM_VERSION}
     extra_hosts:
@@ -26,7 +26,6 @@ services:
       - '${FORWARD_DB_PORT:-5432}:5432'
     volumes:
       - 'sail-pgsql:/var/lib/postgresql/data'
-      - './vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
     networks:
       - sail
     healthcheck:
