@@ -1,3 +1,10 @@
+# [1.0.0-alpha.5](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.4...v1.0.0-alpha.5) (2023-04-25)
+
+
+### Bug Fixes
+
+* fixed parvum service compose file ([35e05ec](https://github.com/parvum-lambda/users/commit/35e05ec9735e4b9895cc816062f9d0cd0d709e7f))
+
 # [1.0.0-alpha.4](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.3...v1.0.0-alpha.4) (2023-04-25)
 
 
