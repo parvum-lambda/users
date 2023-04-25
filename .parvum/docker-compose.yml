@@ -30,7 +30,7 @@ services:
     networks:
       - sail
     healthcheck:
-      test: [ "CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "users" ]
+      test: [ "CMD", "pg_isready", "-q", "-d", "parvum_users", "-U", "users" ]
       retries: 3
       timeout: 5s
 volumes:
