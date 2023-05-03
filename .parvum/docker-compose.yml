@@ -22,8 +22,6 @@ services:
       - pgsql
   pgsql:
     image: 'postgres:15'
-    ports:
-      - '${FORWARD_DB_PORT:-5432}:5432'
     volumes:
       - 'sail-pgsql:/var/lib/postgresql/data'
     networks:
