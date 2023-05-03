@@ -30,6 +30,15 @@ services:
       test: [ "CMD", "pg_isready", "-q", "-d", "parvum_users", "-U", "users" ]
       retries: 3
       timeout: 5s
+  dynamodb:
+    image: amazon/dynamodb-local
+    hostname: dynamodb
+    restart: always
+    volumes:
+      - ./dynamodblocal-data:/home/dynamodblocal/data
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data/"
+    networks:
+      - sail
 volumes:
   sail-pgsql:
     driver: local
