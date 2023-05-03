@@ -1,3 +1,10 @@
+# [1.0.0-alpha.7](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.6...v1.0.0-alpha.7) (2023-05-03)
+
+
+### Bug Fixes
+
+* .parvum/docker-compose.yml added dynamo db service ([ba600f5](https://github.com/parvum-lambda/users/commit/ba600f5001404be742771cffeb16e68c8893dd9e))
+
 # [1.0.0-alpha.6](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.5...v1.0.0-alpha.6) (2023-05-03)
 
 
