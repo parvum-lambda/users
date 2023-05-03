@@ -1,3 +1,10 @@
+# [1.0.0-alpha.8](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.7...v1.0.0-alpha.8) (2023-05-03)
+
+
+### Bug Fixes
+
+* parvum docker compose db credentials ([3b403ea](https://github.com/parvum-lambda/users/commit/3b403ea5c1a9e23b3e4fb4930b7bb4dd21147a32))
+
 # [1.0.0-alpha.7](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.6...v1.0.0-alpha.7) (2023-05-03)
 
 
