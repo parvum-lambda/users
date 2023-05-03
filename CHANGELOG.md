@@ -1,3 +1,10 @@
+# [1.0.0-alpha.6](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.5...v1.0.0-alpha.6) (2023-05-03)
+
+
+### Bug Fixes
+
+* removed pgsql forward port from parvum docker-compose file ([3f40b78](https://github.com/parvum-lambda/users/commit/3f40b78a22f67b275b74ae1ba0d4d82b62abec74))
+
 # [1.0.0-alpha.5](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.4...v1.0.0-alpha.5) (2023-04-25)
 
 
