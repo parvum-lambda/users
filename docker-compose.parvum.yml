@@ -11,7 +11,7 @@ services:
   laravel.test:
     build:
       context: .docker/php/8.2
-      dockerfile: .docker/php/8.2/Dockerfile
+      dockerfile: Dockerfile
     image: sail-8.2/parvum.users
     container_name: parvum.users-local
     extra_hosts:
