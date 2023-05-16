@@ -1,3 +1,11 @@
+# [1.0.0-alpha.9](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.8...v1.0.0-alpha.9) (2023-05-16)
+
+
+### Bug Fixes
+
+* fixed parvum service compose file ([3585eae](https://github.com/parvum-lambda/users/commit/3585eae25934fab5acdfbd6a2372624f3f3ea1d1))
+* update events service ([eb22daf](https://github.com/parvum-lambda/users/commit/eb22daf7513bfa0b857feae5f5c4139f5459d361))
+
 # [1.0.0-alpha.8](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.7...v1.0.0-alpha.8) (2023-05-03)
 
 
