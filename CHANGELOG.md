@@ -1,3 +1,11 @@
+# [1.0.0-alpha.10](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.9...v1.0.0-alpha.10) (2023-06-09)
+
+
+### Features
+
+* full cqrs flow and dynamodb integration ([0e7e664](https://github.com/parvum-lambda/users/commit/0e7e664bf7f46713735a952c19d2c546fdbe2e41))
+* test feat ([621d8d4](https://github.com/parvum-lambda/users/commit/621d8d468fcfe38415caa0eac715694be871261e))
+
 # [1.0.0-alpha.9](https://github.com/parvum-lambda/users/compare/v1.0.0-alpha.8...v1.0.0-alpha.9) (2023-05-16)
 
 
