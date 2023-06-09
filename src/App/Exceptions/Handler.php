@@ -3,37 +3,25 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
 {
     /**
-     * A list of exception types with their corresponding custom log levels.
-     *
-     * @var array<class-string<\Throwable>, \Psr\Log\LogLevel::*>
-     */
-    protected $levels = [
-
-    ];
-
-    /**
      * A list of the exception types that are not reported.
      *
-     * @var array<int, class-string<\Throwable>>
+     * @var array
      */
     protected $dontReport = [
-
     ];
 
     /**
-     * A list of the inputs that are never flashed to the session on validation exceptions.
+     * A list of the inputs that are never flashed for validation exceptions.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $dontFlash = [
-        'current_password',
-        'password',
-        'password_confirmation',
     ];
 
     /**
@@ -41,10 +29,32 @@ class Handler extends ExceptionHandler
      *
      * @return void
      */
-    public function register()
+    public function register() : void
     {
-        $this->reportable(function (Throwable $e) {
+        $this->renderable(static function (BaseUsersException $e) {
+            $responseBody = [
+                'code'        => $e->getCode(),
+                'code_string' => $e->getCodeStr(),
+                'message'     => $e->getMessage(),
+            ];
 
+            if (config('app.debug') === true) {
+                $responseBody['file'] = $e->getFile();
+                $responseBody['line'] = $e->getLine();
+                $responseBody['exception'] = get_class($e);
+                $responseBody['trace'] = $e->getTrace();
+            }
+
+            return Response::json($responseBody, $e->getHttpStatusCode());
         });
+    }
+
+    public function report(Throwable $e) : void
+    {
+        if (app()->bound('sentry') && $this->shouldReport($e)) {
+            app('sentry')->captureException($e);
+        }
+
+        parent::report($e);
     }
 }

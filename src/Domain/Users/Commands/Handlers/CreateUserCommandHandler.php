@@ -7,14 +7,14 @@ use Domain\Users\Events\Producers\CreateUserEventProducer;
 use Domain\Users\Events\Struct\UserCreatedEventStruct;
 use Domain\Users\UserService;
 use Exception;
-use Ramsey\Uuid\Rfc4122\UuidV6;
+use Ramsey\Uuid\Rfc4122\UuidV7;
 use Support\CQRS\Attributes\CommandHandler;
 use Support\CQRS\Interfaces\CommandHandler as CommandHandlerInterface;
 
 #[CommandHandler(CreateUserCommand::class)]
 class CreateUserCommandHandler implements CommandHandlerInterface
 {
-    public function __construct(private UserService $userService)
+    public function __construct(private readonly UserService $userService)
     {
     }
 
@@ -26,11 +26,11 @@ class CreateUserCommandHandler implements CommandHandlerInterface
      */
     public function handle($data) : mixed
     {
-        $userId = UuidV6::uuid6();
+        $userId = UuidV7::uuid7();
 
         (new CreateUserEventProducer(
             new UserCreatedEventStruct(
-                UuidV6::uuid6(),
+                UuidV7::uuid7(),
                 ...$data->getData(),
             )
         ))->dispatch();

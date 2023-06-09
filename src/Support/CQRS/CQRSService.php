@@ -11,11 +11,13 @@ use ReflectionException;
 use Support\CQRS\Attributes\CommandHandler;
 use Support\CQRS\Attributes\EventConsumer;
 use Support\CQRS\Attributes\EventStruct;
+use Support\CQRS\Attributes\QueryHandler;
 
 class CQRSService
 {
     private const DOMAIN_PATH = 'src/Domain';
     private array $commandHandlerMap = [];
+    private array $queryHandlerMap = [];
     private array $eventHandlerMap = [];
     private array $eventTopicStructMap = [];
     private array $topicList = [];
@@ -23,6 +25,7 @@ class CQRSService
     /**
      * @return void
      * @throws ReflectionException
+     * @throws BindingResolutionException
      */
     public function init() : void
     {
@@ -38,6 +41,15 @@ class CQRSService
     public function getHandlerForCommand(string $commandStructClass) : Interfaces\CommandHandler| null
     {
         return $this->commandHandlerMap[$commandStructClass] ?? null;
+    }
+
+    /**
+     * @param string $queryStructClass
+     * @return Interfaces\CommandHandler|null
+     */
+    public function getHandlerForQuery(string $queryStructClass) : Interfaces\QueryHandler| null
+    {
+        return $this->queryHandlerMap[$queryStructClass] ?? null;
     }
 
     /**
@@ -70,7 +82,8 @@ class CQRSService
      * @param Generator|string[] $classes
      * @return void
      *
-     * @throws ReflectionException
+     * @throws ReflectionException|]
+     * @throws BindingResolutionException|]
      */
     private function createMappings(array|Generator $classes) : void
     {
@@ -87,6 +100,7 @@ class CQRSService
             }
 
             self::pushToCommandHandlerMap($commandHandlerMap, $class) ||
+            self::pushToQueryHandlerMap($commandHandlerMap, $class) ||
             self::pushToEventHandlerMap($eventHandlerMap, $topicList, $class) ||
             self::pushToTopicStructMap($eventTopicStructMap, $class);
         }
@@ -118,6 +132,31 @@ class CQRSService
         assert($commandHandlerAttributeInstance instanceof CommandHandler);
 
         $stack[$commandHandlerAttributeInstance->getTargetCommandClass()] = Container::getInstance()->make($currentClass->getName());
+
+        return true;
+    }
+
+    /**
+     * @param $stack
+     * @param ReflectionClass $currentClass
+     * @return bool
+     * @throws BindingResolutionException
+     */
+    private static function pushToQueryHandlerMap(&$stack, ReflectionClass $currentClass) : bool
+    {
+        $queryHandlerAttributeBuffer = $currentClass->getAttributes(QueryHandler::class);
+
+        if (empty($queryHandlerAttributeBuffer)) {
+            return false;
+        }
+
+        $queryHandlerAttribute = $queryHandlerAttributeBuffer[0];
+
+        $queryHandlerAttributeInstance = $queryHandlerAttribute->newInstance();
+
+        assert($queryHandlerAttributeInstance instanceof QueryHandler);
+
+        $stack[$queryHandlerAttributeInstance->getTargetQueryClass()] = Container::getInstance()->make($currentClass->getName());
 
         return true;
     }

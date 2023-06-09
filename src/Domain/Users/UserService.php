@@ -3,6 +3,7 @@
 namespace Domain\Users;
 
 use Domain\Users\Models\User;
+use Domain\Users\Queries\Exceptions\UserNotFoundException;
 use Ramsey\Uuid\UuidInterface;
 
 class UserService
@@ -15,5 +16,23 @@ class UserService
         $user->email = $email;
         $user->document = $document;
         $user->save();
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return User
+     *
+     * @throws UserNotFoundException
+     */
+    public function getUser(string $id) : User
+    {
+        $user = User::find($id);
+
+        if (! $user) {
+            throw new UserNotFoundException();
+        }
+
+        return $user;
     }
 }
