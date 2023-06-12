@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/parvum-lambda/users/compare/v1.0.0...v1.0.1) (2023-06-12)
+
+
+### Bug Fixes
+
+* fixed docker-compose container names ([cc4a0f7](https://github.com/parvum-lambda/users/commit/cc4a0f779a03afc4b95d25e6355f3253f08beda9))
+
 # 1.0.0 (2023-06-12)
 
 
