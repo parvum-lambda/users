@@ -22,6 +22,7 @@ services:
       - pgsql
   pgsql:
     image: 'postgres:15'
+    container_name: parvum.users.pgsql-${PARVUM_VERSION}
     environment:
         PGPASSWORD: 'password'
         POSTGRES_DB: 'parvum_users'
@@ -37,6 +38,7 @@ services:
       timeout: 5s
   dynamodb:
     image: amazon/dynamodb-local
+    container_name: parvum.users.dynamodb-${PARVUM_VERSION}
     hostname: dynamodb
     restart: always
     volumes:

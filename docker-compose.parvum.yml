@@ -12,8 +12,7 @@ services:
     build:
       context: .docker/php/8.2
       dockerfile: Dockerfile
-    image: sail-8.2/parvum.users
-    container_name: parvum.users-local
+    container_name: "parvum.dev-${PARVUM_SERVICE_NAME}"
     extra_hosts:
       - 'host.docker.internal:host-gateway'
       - 'parvum.events:${PARVUM_SERVICE_EVENTS_IP}'
@@ -32,6 +31,7 @@ services:
 
   pgsql:
     image: 'postgres:15'
+    container_name: "parvum.dev-${PARVUM_SERVICE_NAME}-pgsql"
     ports:
       - '${FORWARD_DB_PORT:-5433}:5432'
     environment:
@@ -51,7 +51,7 @@ services:
 
   dynamodb:
     image: amazon/dynamodb-local
-    container_name: my-dynamodb
+    container_name: "parvum.dev-${PARVUM_SERVICE_NAME}-dynamodb"
     hostname: dynamodb
     restart: always
     volumes:
