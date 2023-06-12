@@ -6,7 +6,6 @@ services:
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP:-1000}'
-        image: sail-8.2/users
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
